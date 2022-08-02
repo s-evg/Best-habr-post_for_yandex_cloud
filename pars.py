@@ -5,8 +5,7 @@ from bs4 import BeautifulSoup
 URL = 'https://habr.com/ru/all/'
 HEADERS = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0',
            'accept': '*/*'}
-KEYWORDS = ['дизайн', 'фото', 'web', 'python', 'tele2', 'Астрономия', 'c++']
-keywords = set(KEYWORDS)
+keywords = {'дизайн', 'фото', 'web', 'python *', 'python', 'tele2', 'aстрономия', 'c++'}
 
 
 def habr_info():
@@ -25,7 +24,7 @@ def habr_info():
             title = i.find(class_="tm-article-snippet__title-link").text
             link = 'https://habr.com' + i.find(class_="tm-article-snippet__title-link").get('href')
             hubs = i.find_all(class_="tm-article-snippet__hubs-item-link")
-            hubs = {h.text.strip() for h in hubs}
+            hubs = {h.text.strip().lower() for h in hubs}
             post = requests.get(url=link, headers=HEADERS)
 
             if post.status_code != 200:
@@ -34,13 +33,17 @@ def habr_info():
                 soup_post = BeautifulSoup(post.content, 'lxml')
                 text_post = soup_post.find(id="post-content-body").text
 
-                for word in KEYWORDS:
+                for word in keywords:
 
-                    if word.lower() in text_post:
+                    if word in text_post:
                         info[date] = [f"[{title}]({link})", word]
 
                     if hubs & keywords:
-                        info[date] = [f"[{title}]({link})", ' | '.join(hubs)]
+                        hub = []
+                        for _ in hubs:
+                            if "*" in _:
+                                hub.append(_.replace("*", "\*"))
+                        info[date] = [f"[{title}]({link})", ' | '.join(hub)]
 
     return info
 

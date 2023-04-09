@@ -21,8 +21,8 @@ def habr_info():
 
         for i in pre_post:
             date = i.find('time').get('title')
-            title = i.find(class_="tm-article-snippet__title-link").text
-            link = 'https://habr.com' + i.find(class_="tm-article-snippet__title-link").get('href')
+            title = i.find(class_="tm-title__link").text
+            link = 'https://habr.com' + i.find(class_="tm-title__link").get('href')
             hubs = i.find_all(class_="tm-article-snippet__hubs-item-link")
             hubs = {h.text.strip().lower() for h in hubs}
             post = requests.get(url=link, headers=HEADERS)

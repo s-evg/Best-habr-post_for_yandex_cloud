@@ -20,12 +20,15 @@ def habr_info():
         pre_post = soup.select("article")
 
         for i in pre_post:
-            date = i.find('time').get('title')
-            title = i.find(class_="tm-title__link").text
-            link = 'https://habr.com' + i.find(class_="tm-title__link").get('href')
-            hubs = i.find_all(class_="tm-article-snippet__hubs-item-link")
-            hubs = {h.text.strip().lower() for h in hubs}
-            post = requests.get(url=link, headers=HEADERS)
+            try:
+                date = i.find('time').get('title')
+                title = i.find(class_="tm-title__link").text
+                link = 'https://habr.com' + i.find(class_="tm-title__link").get('href')
+                hubs = i.find_all(class_="tm-article-snippet__hubs-item-link")
+                hubs = {h.text.strip().lower() for h in hubs}
+                post = requests.get(url=link, headers=HEADERS)
+            except AttributeError:
+                pass
 
             if post.status_code != 200:
                 print(f'Страница статьи {title} не доступна.')
